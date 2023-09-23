@@ -133,8 +133,7 @@ classdef solver
             end
             
             % Prepare region to calculate number of holes
-            pieceMat = piece.getOrientations();
-            pieceMat = pieceMat{location(3)};
+            pieceMat = piece.getOrientation(location(3));
             heightMapRegion = heightMap(location(1):location(1)+size(pieceMat, 2)-1);
             bottom = max(min(heightMapRegion), 1);
             region = stateToScore.data( 21 - location(2): 21 - bottom,location(1):location(1)+size(pieceMat, 2)-1);
