@@ -25,7 +25,7 @@ classdef solver
             delete(obj.cpuPool);
         end
         
-        function loc = solve(obj, currentState, currentPiece, nextPiece)
+        function [loc, hold] = solve(obj, currentState, currentPiece, nextPiece)
             arguments
                 obj solver
                 currentState state
@@ -57,7 +57,8 @@ classdef solver
                     allPieces = [allPieces, obj.held];
                 end
             end
-            
+            hold = false;
+            pastFirstIter = false;
             for piece=allPieces
                 possiblePositions = obj.getAllPossibleLocations(heightMap, piece);
                 
@@ -83,7 +84,11 @@ classdef solver
                 if lowScore < lowestScore
                     lowestScore = lowScore;
                     loc = possiblePositions(idx, :);
+                    if pastFirstIter
+                        hold = true;
+                    end
                 end
+                pastFirstIter = true;
             end
         end
         
