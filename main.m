@@ -9,17 +9,12 @@ warning('off', 'MATLAB:polyshape:boolOperationFailed');
 warning('off', 'MATLAB:polyshape:boundary3Points');
 
 
-files = ["jstris", "tetris"];
-for i = 1:numel(files)
-    tetris = imread("SampleCaptures/" + files(i) + ".png");
+files = ["tetris", "tetris1080", "jstris", "jstris1080"];
+for file = 1:numel(files)
+    tetris = imread("SampleCaptures/" + files(file) + ".png");
+    
     s = state(tetris);
-    
-    figure;
-    imshow(tetris);
-    hold on;
-    probes = s.probes;
-    
-    for p = 1:numrows(probes)
-        plot(probes(p,1), probes(p,2), 'r.', 'MarkerSize', 20);
-    end
+    tic;
+    s = s.updateState(tetris);
+    toc
 end

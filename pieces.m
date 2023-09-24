@@ -41,6 +41,16 @@ classdef pieces
             {uint(0), uint(1), uint(0), uint(0)};
             {uint(0), uint(1), uint(0), uint(0)};
             };
+        
+        pieceColors = {
+            [49, 199, 239];
+            [247, 211, 8];
+            [173, 77, 156];
+            [66, 182, 66];
+            [239, 32, 41];
+            [90, 101, 173];
+            [239, 121, 33];
+            };
     end
     
     methods
@@ -145,6 +155,49 @@ classdef pieces
                     x = obj.rotationMovement{7}{orientationIndex};
                 case pieces.nop
                     error('nop has no rotation movement');
+            end
+        end
+        
+        
+    end
+    
+    methods (Static)
+        function [pieceIndex, dist] = getPieceFromColor(color, backgroundColor)
+
+            if max(color) - min(color) < 10
+                dist = 255;
+                pieceIndex = 8;
+                return;
+            end
+
+            % Check distance to all colors including background color
+            distances = zeros(1, 9);
+            for i = 1:7
+                distances(i) = sqrt(sum((color - pieces.pieceColors{i}).^2));
+            end
+            distances(8) = sqrt(sum((color - backgroundColor).^2));
+            distances(9) = sqrt(sum((color - [255, 255, 255]).^2));
+            [dist, pieceIndex] = min(distances);
+        end
+        
+        function piece = getPiece(index)
+            switch index
+                case 1
+                    piece = pieces.I;
+                case 2
+                    piece = pieces.O;
+                case 3
+                    piece = pieces.T;
+                case 4
+                    piece = pieces.S;
+                case 5
+                    piece = pieces.Z;
+                case 6
+                    piece = pieces.J;
+                case 7
+                    piece = pieces.L;
+                otherwise
+                    piece = pieces.nop;
             end
         end
     end
