@@ -2,24 +2,18 @@ classdef state
     properties(Constant)
         kernel = kdgauss(0.5);
         invkernel = kdgauss(0.5)';
-        crop = [0.18, 0.94, 0.19, 0.71];
+        crop = [300, 1500, 500, 1800];
     end
     properties
         probes (200, 2) {mustBeNumericOrLogical}
         data (20, 10)
-        piece pieces
-        nextPiece pieces
-        heldPiece pieces
     end
     methods
         % Create state given the capture of the screen
         function obj = state(data)
             
             % Crop the data
-            % 1600*2560 = [300, 1500, 500, 1800];
-            
-            crop = [size(tetris, 1) *  state.crop(1), size(tetris, 1) * state.crop(2), size(tetris, 2) * state.crop(3), size(tetris, 2) * state.crop(4)];
-            data = data(crop(1):crop(2), crop(3):crop(4), :);
+            data = rgb2gray(data(state.crop(1):state.crop(2), state.crop(3):state.crop(4), :));
             
             % Do Edge Detection on the images
             Iu = iconvolve(data, obj.kernel);
@@ -28,7 +22,7 @@ classdef state
             data = sqrt(Iu.^2 + Iv.^2);
             
             % Convert the data to binary with high threshold
-            data = rgb2gray(data) < 0.001;
+            data = (data) < 0.001;
             
             % Get the shapes described by the data
             boundaries = bwboundaries(data);
@@ -110,18 +104,17 @@ classdef state
             end
             
             % Get the rectangle corners
-            miX = min(rectanglesOfInterest.Vertices(:, 1)) + crop(3);
-            maX = max(rectanglesOfInterest.Vertices(:, 1)) + crop(3);
-            miY = min(rectanglesOfInterest.Vertices(:, 2)) + crop(1);
-            maY = max(rectanglesOfInterest.Vertices(:, 2)) + crop(1);
+            miX = min(rectanglesOfInterest.Vertices(:, 1)) + state.crop(1);
+            maX = max(rectanglesOfInterest.Vertices(:, 1)) + state.crop(1);
+            miY = min(rectanglesOfInterest.Vertices(:, 2)) + state.crop(3);
+            maY = max(rectanglesOfInterest.Vertices(:, 2)) + state.crop(3);
             
-            tetrisSquareX = (maX - miX) / 10;
-            tetrisSquareY = (maY - miY) / 20;
+            tetrisSquareSize = (((maX - miX) / 10) + ((maY - miY) / 20)) / 2;
             i = 0;
-            for x=miX+(tetrisSquareX/2):tetrisSquareX:maX
-                for y=miY+(tetrisSquareY/2):tetrisSquareY:maY
+            for x=miX+floor(tetrisSquareSize/2):tetrisSquareSize:maX
+                for y=miY+floor(tetrisSquareSize/2):tetrisSquareSize:maY
                     i = i + 1;
-                    obj.probes(i, :) = uint16([x y]);
+                    obj.probes(i, :) = uint8[x y];
                 end
             end
         end

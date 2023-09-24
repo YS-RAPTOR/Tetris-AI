@@ -9,7 +9,7 @@ classdef pieces
         L,
         nop
     end
-    properties (SetAccess = immutable)
+    properties (Constant)
         possibleOrientations  = {
             {uint8([1, 1, 1, 1]), uint8([1; 1; 1; 1])};
             {uint8([1, 1; 1, 1])};

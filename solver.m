@@ -3,7 +3,6 @@ classdef solver
         cpuPool % The pool of workers to use for parallel processing
         canHold {mustBeNumericOrLogical} % 1 if the piece can be held
         debug {mustBeNumericOrLogical} % 1 if debug is enabled
-        held pieces
     end
     
     methods
@@ -18,19 +17,16 @@ classdef solver
             %obj.cpuPool = parpool('local', 10);
             obj.debug = debug;
             obj.canHold = canHold;
-            obj.held = pieces.nop;
         end
         
         function delete(obj)
             delete(obj.cpuPool);
         end
         
-        function [loc, hold] = solve(obj, currentState, currentPiece, nextPiece)
+        function [loc, hold] = solve(obj, currentState)
             arguments
                 obj solver
                 currentState state
-                currentPiece pieces
-                nextPiece pieces
             end
             % Go through all possible reachable positions for the piece
             % For now just dropping it in all possible locations. No fancy shit
@@ -46,15 +42,15 @@ classdef solver
                 end
             end
             
-            allPieces = currentPiece;
+            allPieces = currentState.piece;
             lowestScore = Inf;
             
             if obj.canHold
-                if(currentPiece ~= nextPiece && obj.held == pieces.nop)
-                    allPieces = [allPieces, nextPiece];
+                if(currentState.piece ~= currentState.nextPiece && currentState.heldPiece == pieces.nop)
+                    allPieces = [allPieces, currentState.nextPiece];
                 end
-                if obj.held ~= pieces.nop && obj.held ~= nextPiece && obj.held ~= currentPiece
-                    allPieces = [allPieces, obj.held];
+                if currentState.heldPiece ~= pieces.nop && currentState.heldPiece ~= currentState.nextPiece && currentState.heldPiece ~= currentState.piece
+                    allPieces = [allPieces, currentState.heldPiece];
                 end
             end
             hold = false;
