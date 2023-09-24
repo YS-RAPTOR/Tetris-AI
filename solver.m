@@ -1,22 +1,17 @@
 classdef solver
     properties
         cpuPool % The pool of workers to use for parallel processing
-        canHold {mustBeNumericOrLogical} % 1 if the piece can be held
         debug {mustBeNumericOrLogical} % 1 if debug is enabled
     end
     
     methods
-        function obj = solver(debug, canHold)
+        function obj = solver(debug)
             if nargin < 1
                 debug = false;
-            end
-            if nargin < 2
-                canHold = false;
             end
             
             %obj.cpuPool = parpool('local', 10);
             obj.debug = debug;
-            obj.canHold = canHold;
         end
         
         function delete(obj)
@@ -45,16 +40,16 @@ classdef solver
             allPieces = currentState.piece;
             lowestScore = Inf;
             
-            if obj.canHold
-                if(currentState.piece ~= currentState.nextPiece && currentState.heldPiece == pieces.nop)
-                    allPieces = [allPieces, currentState.nextPiece];
-                end
-                if currentState.heldPiece ~= pieces.nop && currentState.heldPiece ~= currentState.nextPiece && currentState.heldPiece ~= currentState.piece
-                    allPieces = [allPieces, currentState.heldPiece];
-                end
+            if(currentState.piece ~= currentState.nextPiece && currentState.heldPiece == pieces.nop)
+                allPieces = [allPieces, currentState.nextPiece];
             end
+            if currentState.heldPiece ~= pieces.nop && currentState.heldPiece ~= currentState.nextPiece && currentState.heldPiece ~= currentState.piece
+                allPieces = [allPieces, currentState.heldPiece];
+            end
+            
             hold = false;
             pastFirstIter = false;
+            
             for piece=allPieces
                 possiblePositions = obj.getAllPossibleLocations(heightMap, piece);
                 

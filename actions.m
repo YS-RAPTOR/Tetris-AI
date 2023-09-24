@@ -4,9 +4,9 @@ classdef actions
     end
     
     methods
-        function actionsList = GetActionsList(obj, endPosition, piece, hold)
+        function actionsList = GetActionsList(~, endPosition, piece, hold)
             arguments
-                obj actions
+                ~
                 endPosition (1, 3) {mustBeNumeric}
                 piece pieces
                 hold {mustBeNumericOrLogical}
